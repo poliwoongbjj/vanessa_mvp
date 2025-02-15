@@ -61,47 +61,58 @@ export default function Home() {
     return (
         <div>    
         <div className="container my-3">
-         <h2>Add Student</h2>
-     
+
+        {/* FORM */}
+        <div className="row justify-content-center">
+          <div className="col-lg-8 col-md-10 col-sm-12"> {/* Limits width on large screens */}
+ 
+        {/* Header */}
+        <h2 className="mt-2">Add Student</h2>
+        <div className="border-bottom mb-3"></div>
+
+
+        {/* First name */}
         <form onSubmit={e => handleSubmit(e)}>
-        <div class="row g-3">
-            <div class="col-sm-6">
-              <label for="firstName" class="form-label">First name</label>
+        <div className="row g-3">
+          <div className="col-sm-6">
+            <label htmlFor="firstName" className="form-label">First name</label>
               <input 
                 type="text" 
-                class="form-control" 
+                className="form-control" 
                 id="firstName" 
                 name="first_name"
                 placeholder="" 
                 value={formData.first_name} 
                 onChange={e => handleChange(e)}
                 required="" />
-              <div class="invalid-feedback">
+              <div className="invalid-feedback">
                 Valid first name is required.
               </div>
             </div>
 
-            <div class="col-sm-6">
-              <label for="lastName" class="form-label">Last name</label>
+            {/* Last name */}
+            <div className="col-sm-6">
+              <label htmlFor="lastName" className="form-label">Last name</label>
               <input 
                 type="text" 
-                class="form-control" 
+                className="form-control" 
                 id="lastName" 
                 name="last_name"
                 placeholder="" 
                 value={formData.last_name} 
                 onChange={e => handleChange(e)}
                 required="" />
-              <div class="invalid-feedback">
+              <div className="invalid-feedback">
                 Valid last name is required.
               </div>
             </div>
 
-            <div class="col-12">
-              <label for="email" class="form-label">Email</label>
+            {/* email */}
+            <div className="col-12">
+              <label htmlFor="email" className="form-label">Email</label>
               <input 
                 type="email" 
-                class="form-control" 
+                className="form-control" 
                 id="email" 
                 name="email"
                 placeholder=""
@@ -109,16 +120,17 @@ export default function Home() {
                 onChange={e => handleChange(e)}
                 required=""
                 />
-              <div class="invalid-feedback">
+              <div className="invalid-feedback">
                 Please enter a valid email address.
               </div>
             </div>
 
-            <div class="col-12">
-              <label for="phone" class="form-label">Phone Number</label>
+            {/* phone */}
+            <div className="col-12">
+              <label htmlFor="phone" className="form-label">Phone Number</label>
               <input 
                 type="text" 
-                class="form-control" 
+                className="form-control" 
                 id="phone" 
                 name="phone"
                 placeholder="123-456-7890" 
@@ -126,16 +138,17 @@ export default function Home() {
                 value={formData.phone}
                 onChange={e => handleChange(e)}
                 />
-              <div class="invalid-feedback">
+              <div className="invalid-feedback">
                 Please enter a valid phone number.
               </div>
             </div>
 
-            <div class="col-12">
-              <label for="tuition" class="form-label">Tuition</label>
+            {/* Tuition */}
+            <div className="col-12">
+              <label htmlFor="tuition" className="form-label">Tuition</label>
               <input 
                 type="number" 
-                class="form-control" 
+                className="form-control" 
                 id="tuition" 
                 name="tuition"
                 placeholder="0.00" 
@@ -146,10 +159,11 @@ export default function Home() {
                  />
             </div>
 
-            <div class="col-md-6">
-              <label for="instrument" class="form-label">Instrument</label>
+            {/* Instrument */}
+            <div className="col-md-6">
+              <label htmlFor="instrument" className="form-label">Instrument</label>
               <select 
-                class="form-select" 
+                className="form-select" 
                 id="instrument" 
                 name="instrument"
                 required=""
@@ -162,15 +176,16 @@ export default function Home() {
                 <option value="piano">Piano</option>
                 <option value="accordion">Accordion</option>
               </select>
-              <div class="invalid-feedback">
+              <div className="invalid-feedback">
                 Please select an instrument.
               </div>
             </div>
 
-            <div class="col-md-6">
-              <label for="enrollment-status" class="form-label">Currently Enrolled</label>
+            {/* Enrollment status */}
+            <div className="col-md-6">
+              <label htmlFor="enrollment-status" className="form-label">Currently Enrolled</label>
               <select 
-                class="form-select" 
+                className="form-select" 
                 id="enrollment-status" 
                 name="enrolled"
                 required=""
@@ -181,17 +196,20 @@ export default function Home() {
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
-              <div class="invalid-feedback">
+              <div className="invalid-feedback">
                 Please select yes or no.
               </div>
             </div>
+
+            {/* Submit Button */}
                 <div className="col-12">
                 <button type="submit" className="btn btn-primary">Submit</button>
                 </div>
 
           </div>
-            
         </form>
+        </div>
+        </div>
         </div>
         </div>
     )

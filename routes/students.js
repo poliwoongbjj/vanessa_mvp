@@ -73,7 +73,6 @@ router.get('/check/unpaid', async (req, res, next) => {
     JOIN payments ON students.id = payments.student_id
      WHERE payments.is_paid = 0
      ORDER BY students.first_name ASC;`);
-      console.log("Unpaid students:", results.data);
     res.send(results.data);
   } catch (error) {
     console.log("Error fetching unpaid students:", error);
@@ -92,7 +91,73 @@ router.post("/", async (req, res, next) => {
   }
 })
 
-// DELETE student
+
+// POST payment
+// "/api/students/:id"
+router.post('/:id', async  (req, res, next) => {
+  const { id } = req.params;
+  const { due_date  } = req.body;
+
+  try {
+
+    await db(`INSERT INTO payments (student_id, due_date, is_paid) VALUES (${id}, "${due_date}", 0);`)
+
+    const results = await db(`SELECT students.*, 
+      DATE_FORMAT(payments.due_date, '%M %d %Y') AS due_date,
+      DATE_FORMAT(payments.payment_date,'%M %d %Y') AS payment_date,
+      payments.is_paid, 
+      payments.id AS payment_id 
+      FROM students 
+      LEFT JOIN payments ON students.id = payments.student_id 
+      WHERE students.id = ${id};`);
+      const student = treatStudentData(results.data);
+      res.send(student);
+  } catch (error) {
+    console.log(error);
+  }
+})
+
+// PATCH unpaid payment for specific student using payment id (payment_date and is_paid)
+// UPDATE payments SET payment_date = "2025-02-06", is_paid=NOT is_paid WHERE id=4;
+router.put("/check/unpaid/:id", async (req,  res, next) => {
+  const { id } = req.params;
+  const { payment_date } = req.body;
+
+  // Ensure payment_date is provided if is_paid is being updated
+  if (typeof is_paid !== "undefined" && !payment_date) {
+  return res.status(400).json({ error: "payment date is required" });
+  }
+
+  try {
+    await db(`UPDATE payments SET payment_date = "${payment_date}", is_paid=1 WHERE id=${id};`);
+
+    //GET THE DATA
+    const results = await db(`SELECT students.id, students.first_name, students.last_name, payments.id AS payment_id, payments.due_date, payments.payment_date
+    FROM students
+    JOIN payments ON students.id = payments.student_id
+     WHERE payments.is_paid = 0
+     ORDER BY students.first_name ASC;`)
+    res.send(results.data)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+
+// DELETE payment (feature extension)
+// "/api/students/payments/:id"
+router.delete("/payments/:id", async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    await db(`DELETE FROM payments WHERE id=${id}`)
+    res.send({message: "Payment deleted"});
+  } catch (error) {
+    console.log(error)
+  }
+});
+
+// DELETE student (feature extension)
 // "/api/students/:id"
 router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
@@ -107,56 +172,6 @@ router.delete("/:id", async (req, res, next) => {
 
 // GET all students with their payments 
 // "/api/students/payments"
-
-// POST payment
-// "/api/students/:id"
-router.post('/:id', async  (req, res, next) => {
-  const { id } = req.params;
-  const { due_date  } = req.body;
-
-  try {
-
-    await db(`INSERT INTO payments (student_id, due_date, is_paid) VALUES (${id}, "${due_date}", 0);`)
-
-    res.send({message: "Payment created"});
-  } catch (error) {
-    console.log(error);
-  }
-})
-
-// PATCH payment for specific student using payment id (payment_date and is_paid)
-// "/api/students/payments/:id"
-// UPDATE payments SET payment_date = "2025-02-06", is_paid=NOT is_paid WHERE id=4;
-router.put("/check/unpaid/:id", async (req,  res, next) => {
-  const { id } = req.params;
-  const { payment_date } = req.body;
-
-  // Ensure payment_date is provided if is_paid is being updated
-  if (typeof is_paid !== "undefined" && !payment_date) {
-  return res.status(400).json({ error: "payment date is required" });
-}
-
-  try {
-    await db(`UPDATE payments SET payment_date = "${payment_date}", is_paid=1 WHERE id=${id};`);
-    res.send({message: "Payment updated"})
-  } catch (error) {
-    console.log(error)
-  }
-})
-
-
-// DELETE payment
-// "/api/students/payments/:id"
-router.delete("/payments/:id", async (req, res, next) => {
-  const { id } = req.params;
-
-  try {
-    await db(`DELETE FROM payments WHERE id=${id}`)
-    res.send({message: "Payment deleted"});
-  } catch (error) {
-    console.log(error)
-  }
-})
 
 
 //PATCH student info (feature extension)

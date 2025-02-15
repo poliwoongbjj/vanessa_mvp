@@ -31,11 +31,14 @@ export default function Student () {
           : `${month} - NOT PAID`;
   };
 
+  // FUNCTION TO GET DUE DATE (FIRST OF FOLLOWING MONTH)
   const getNextMonthFirstDate = () => {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth() + 1, ).toISOString().split("T")[0];
   }
 
+
+  // BUTTON WILL ADD PAYMENT WITH DUE DATE OF FIRST OF FOLLOWING MONTH
   const addPayment = async (id) => {
     const newPayment = {
       due_date: getNextMonthFirstDate()
@@ -51,24 +54,31 @@ export default function Student () {
       });
       const data = await response.json();
       setStudent(data);
-      getStudents();
     } catch (error) {
       console.log(error)
     }
   }
 
-
     return (
-        <div>
+        <div className="container mx-4 mt-2">
+          <div className="row justify-content-center">
+          <div className="col-lg-8 col-md-10 col-sm-12">
+
           {student && (
             <div>
-          <h3>This is {`${student.first_name} ${student.last_name}'s payment history`}</h3>
+              <div className="d-flex align-items-center justify-content-between">
+          <h3 className="mb-0">{`${student.first_name} ${student.last_name} Payment History`}</h3>
+          <button className="btn btn-primary btn-sm ms-3 mb-1" onClick={()=> addPayment(student.id)}>Add Payment</button>
+          </div>
+          <div className="border-bottom mb-3"></div>
           {student.payments.map((payment) => (
             <p key={payment.payment_id}>{formatPayment(payment)}</p>
           ))}
-           <button onClick={()=> addPayment(student.id)}>Add Payment</button>
+          
           </div>
           )}  
+          </div>
+          </div>
         </div>
     )
 }
