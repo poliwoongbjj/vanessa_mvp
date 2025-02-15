@@ -9,7 +9,7 @@ const db = require("../model/helper");
 router.get("/", async (req, res, next) => {
   // question, when do we need to use "next"
   try {
-    const results = await db("SELECT * FROM students;");
+    const results = await db("SELECT * FROM students ORDER BY first_name;");
     res.send(results.data);
   } catch (error) {
     console.log(error);
@@ -65,16 +65,18 @@ router.get("/:id", async (req, res, next) => {
 
 // GET unpaid students
 // "/api/students/unpaid"
-router.get('/unpaid', async (req, res, next) => {
+router.get('/check/unpaid', async (req, res, next) => {
+  // console.log("*** Entering unpaid ***");
   try {
-    const results = await db (
-      `SELECT DISTINCT students.*
-      FROM students
-      LEFT JOIN payments ON students.id = payments.student_id 
-      WHERE payments.is_paid = false;`);
+    const results = await db (`SELECT students.id, students.first_name, students.last_name, payments.id AS payment_id, payments.due_date, payments.payment_date
+    FROM students
+    JOIN payments ON students.id = payments.student_id
+     WHERE payments.is_paid = 0
+     ORDER BY students.first_name ASC;`);
+      console.log("Unpaid students:", results.data);
     res.send(results.data);
   } catch (error) {
-    console.log(error);
+    console.log("Error fetching unpaid students:", error);
   }
 })
 
@@ -107,15 +109,14 @@ router.delete("/:id", async (req, res, next) => {
 // "/api/students/payments"
 
 // POST payment
-// "/api/students/:id/payment"
-router.post('/:id/payment', async  (req, res, next) => {
+// "/api/students/:id"
+router.post('/:id', async  (req, res, next) => {
   const { id } = req.params;
-  const { payment_date, due_date, is_paid } = req.body;
-  try {
-    // Handle `null` properly for payment_date
-    const paymentDateValue = payment_date ? `"${payment_date}"` : `NULL`;
+  const { due_date  } = req.body;
 
-    await db(`INSERT INTO payments (student_id, payment_date, due_date, is_paid) VALUES (${id}, ${paymentDateValue}, "${due_date}", ${is_paid});`)
+  try {
+
+    await db(`INSERT INTO payments (student_id, due_date, is_paid) VALUES (${id}, "${due_date}", 0);`)
 
     res.send({message: "Payment created"});
   } catch (error) {
@@ -126,9 +127,9 @@ router.post('/:id/payment', async  (req, res, next) => {
 // PATCH payment for specific student using payment id (payment_date and is_paid)
 // "/api/students/payments/:id"
 // UPDATE payments SET payment_date = "2025-02-06", is_paid=NOT is_paid WHERE id=4;
-router.put("/payments/:id", async (req,  res, next) => {
+router.put("/check/unpaid/:id", async (req,  res, next) => {
   const { id } = req.params;
-  const { payment_date, is_paid } = req.body;
+  const { payment_date } = req.body;
 
   // Ensure payment_date is provided if is_paid is being updated
   if (typeof is_paid !== "undefined" && !payment_date) {

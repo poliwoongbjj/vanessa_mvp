@@ -4,7 +4,6 @@ import Students from "./components/Students"
 import Page404 from "./components/Page404"
 import Navbar from "./components/Navbar";
 import Student from "./components/Student"
-import PaymentUpdate from "./components/PaymentUpdate";
 
 
 
