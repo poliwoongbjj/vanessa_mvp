@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Home() {
+export default function AddStudent () {
     const [formData, setFormData] = useState({
         first_name: "",
         last_name: "",

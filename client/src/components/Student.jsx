@@ -21,8 +21,11 @@ export default function Student () {
         getStudents();
     }, []);
 
+    // Makes payment table information readable for the user
     const formatPayment = (payment) => {
-      if (!payment || !payment.due_date) return "No payment data available"; // Handle null cases
+      if (!payment || !payment.due_date) return "No payment data available"; 
+      // Handle null cases like after you add a student and there is no payment info, everything is null 
+      //if this isn't here, Payment due_date will automatically be set to December 31
       
       const dueDate = new Date(payment.due_date);
       const month = dueDate.toLocaleString("en-US", { month: "long" }); // Gets full month name

@@ -64,11 +64,18 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // GET unpaid students
-// "/api/students/unpaid"
+// "/api/students/unpaid" -- OLD ROUTE KEPT CRASHING
+// "/api/students/check/unpaid" -- NEW ROUTE 
 router.get('/check/unpaid', async (req, res, next) => {
   // console.log("*** Entering unpaid ***");
   try {
-    const results = await db (`SELECT students.id, students.first_name, students.last_name, payments.id AS payment_id, payments.due_date, payments.payment_date
+    const results = await db (
+      `SELECT students.id, 
+      students.first_name, 
+      students.last_name, 
+      payments.id AS payment_id, 
+      payments.due_date, 
+      payments.payment_date
     FROM students
     JOIN payments ON students.id = payments.student_id
      WHERE payments.is_paid = 0
@@ -94,6 +101,7 @@ router.post("/", async (req, res, next) => {
 
 // POST payment
 // "/api/students/:id"
+// Because this is for one student, you need to use the treatStudentData function
 router.post('/:id', async  (req, res, next) => {
   const { id } = req.params;
   const { due_date  } = req.body;

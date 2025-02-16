@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "./components/Home";
+import AddStudent from "./components/AddStudent";
 import Students from "./components/Students"
 import Page404 from "./components/Page404"
 import Navbar from "./components/Navbar";
@@ -15,7 +15,7 @@ function App() {
       
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<AddStudent />} />
         <Route path="/students" element={<Students />} />
         <Route path="/students/:id" element={<Student />} />
         <Route path="*" element={<Page404 />} />
