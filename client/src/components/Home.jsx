@@ -60,11 +60,11 @@ export default function Home() {
 
     return (
         <div>    
-        <div className="container my-3">
+        <div id="add-student-form" className="container mb-5">
 
         {/* FORM */}
         <div className="row justify-content-center">
-          <div className="col-lg-8 col-md-10 col-sm-12"> {/* Limits width on large screens */}
+          <div className="col-lg-8 col-md-10 col-sm-12 shadow"> {/* Limits width on large screens */}
  
         {/* Header */}
         <h2 className="mt-2">Add Student</h2>
@@ -202,7 +202,7 @@ export default function Home() {
             </div>
 
             {/* Submit Button */}
-                <div className="col-12">
+                <div className="col-12 mb-2">
                 <button type="submit" className="btn btn-primary">Submit</button>
                 </div>
 

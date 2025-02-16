@@ -27,8 +27,8 @@ export default function Student () {
       const dueDate = new Date(payment.due_date);
       const month = dueDate.toLocaleString("en-US", { month: "long" }); // Gets full month name
       return payment.is_paid
-          ? `${month} - PAID on ${new Date(payment.payment_date).toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric" })}`
-          : `${month} - NOT PAID`;
+          ? `${month} - ✅ PAID on ${new Date(payment.payment_date).toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric" })}`
+          : `${month} - ❌ NOT PAID`;
   };
 
   // FUNCTION TO GET DUE DATE (FIRST OF FOLLOWING MONTH)
@@ -65,14 +65,14 @@ export default function Student () {
           <div className="col-lg-8 col-md-10 col-sm-12">
 
           {student && (
-            <div>
+            <div className="py-3 px-3 shadow">
               <div className="d-flex align-items-center justify-content-between">
-          <h3 className="mb-0">{`${student.first_name} ${student.last_name} Payment History`}</h3>
+          <h2 className="mb-0">{`${student.first_name} ${student.last_name} Payment History`}</h2>
           <button className="btn btn-primary btn-sm ms-3 mb-1" onClick={()=> addPayment(student.id)}>Add Payment</button>
           </div>
           <div className="border-bottom mb-3"></div>
           {student.payments.map((payment) => (
-            <p key={payment.payment_id}>{formatPayment(payment)}</p>
+            <p key={payment.payment_id} className="fs-5">{formatPayment(payment)}</p>
           ))}
           
           </div>

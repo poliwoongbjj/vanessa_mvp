@@ -3,7 +3,8 @@ import Home from "./components/Home";
 import Students from "./components/Students"
 import Page404 from "./components/Page404"
 import Navbar from "./components/Navbar";
-import Student from "./components/Student"
+import Student from "./components/Student";
+import "./App.css";
 
 
 

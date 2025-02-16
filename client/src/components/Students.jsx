@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export default function Customers() {
     const [students, setStudents] = useState([]);
     const [unpaidStudents, setUnpaidStudents] = useState([]);
-    const [showUnpaid, setShowUnpaid] =useState(false); // Toggle for showing unpaid students
+    // const [showUnpaid, setShowUnpaid] =useState(false); // Toggle for showing unpaid students
     
     const getStudents = async () => {
         try {
@@ -16,26 +16,28 @@ export default function Customers() {
             console.log(error)
         }
     };
-
-    useEffect(() => {
-        getStudents();
-    }, []);
-
+   
     const getUnpaidStudents = async () => {
         try {
             const response = await fetch ("/api/students/check/unpaid");
             const data = await response.json();
             setUnpaidStudents(data);
-            setShowUnpaid(true); // Show unpaid students when fetched
+            //setShowUnpaid(true); // Show unpaid students when fetched
         } catch (error) {
             console.log(error)
         }
     };
 
-    const handleShowUnpaidStudents = event => {
-        event.preventDefault();
+     useEffect(() => {
+        getStudents();
         getUnpaidStudents();
-    }
+    }, []);
+
+
+    // const handleShowUnpaidStudents = event => {
+    //     event.preventDefault();
+    //     getUnpaidStudents();
+    // }
 
     const todaysDate = () => new Date().toLocaleDateString("sv-SE");
     
@@ -60,26 +62,22 @@ export default function Customers() {
       }
 
     return (
-        <div className="container mt-4">
-            <div className="row mb-2">
-            <div className="col">
-                <h2>Student List</h2>
-            </div>
-             <div className="col">
+        <div className="container mt-4" style={{ maxWidth: "900px" }}>
+            
+            {/* BUTTON TO DISPLAY UNPAID STUDENTS */}
+             {/* <div className="col">
                 <button 
                 className="btn btn-outline-danger btn-sm"
                 onClick={e => handleShowUnpaidStudents(e)}>
                     Unpaid Students
                     </button>
-             </div>
+             </div> */}
             
-
-            </div>
-
           
-            <div className="row">
+            <div className="row gap-4 px-3 ">
              {/* Left Column - Student List */}
-             <div className="col-md-5">
+             <div className="col-md-4 py-2">
+             <h2>Student List</h2>
             <ul className="list-group ms-2"  style={{ maxWidth: "300px" }}>
                 {students.map((student) => (
                 <li key={student.id} className="list-group-item">    
@@ -94,10 +92,10 @@ export default function Customers() {
 
             {/* Right Column - Unpaid Students */}
             {/* Show unpaid students if the button is clicked */}
-                <div className="col-sm-7">
-                {showUnpaid && (
+                <div className="col-md-6 py-2">
+                
                     <div>
-                     <h3>Unpaid Students</h3>
+                     <h2>Students - Unpaid Payments</h2>
                        <ul className="list-unstyled">
                         {unpaidStudents.map(student => {
                             // Convert due_date to a readable month
@@ -105,7 +103,6 @@ export default function Customers() {
                         return (
                             <li key={student.id} className="list-group-item d-flex justify-content-between align-items-center">
                                 {student.first_name} {student.last_name} - Due: {dueMonth}
-                            
                               <button 
                                 className="btn btn-outline-success btn-sm my-1" 
                                 onClick={() => markPaid(student.payment_id)}>
@@ -119,7 +116,7 @@ export default function Customers() {
                             </ul>
                             
                     </div>
-                )}
+                
                   </div>
             </div>
         </div>
