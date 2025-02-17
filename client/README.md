@@ -1,6 +1,6 @@
 # Version 1
 
-To streamline payment management for my dad's guitar school, I developed Payment Tracker, a full-stack application. The frontend is built with React, React Router, and Bootstrap, while the backend utilizes Express, MySQL, Nodemon, and dotenv.
+To streamline payment management for my dad's guitar school, I developed a full-stack application Payment Tracker. The frontend is built with React, React Router, and Bootstrap, while the backend utilizes Express, MySQL, Nodemon, and dotenv.
 
 ## Dependencies
 
