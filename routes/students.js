@@ -24,6 +24,7 @@ const treatStudentData = (data) => {
     email: data[0].email,
     phone: data[0].phone,
     tuition: data[0].tuition,
+    instrument: data[0].instrument,
     enrolled: data[0].enrolled,
     payments: []
   }
@@ -42,7 +43,7 @@ const treatStudentData = (data) => {
 
 
 // GET single student and include payment info
-// "/api/students/:id
+// "/api/students/:id"
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
@@ -64,7 +65,6 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // GET unpaid students
-// "/api/students/unpaid" -- OLD ROUTE KEPT CRASHING
 // "/api/students/check/unpaid" -- NEW ROUTE 
 router.get('/check/unpaid', async (req, res, next) => {
   // console.log("*** Entering unpaid ***");
@@ -153,35 +153,17 @@ router.put("/check/unpaid/:id", async (req,  res, next) => {
 
 
 // DELETE payment (feature extension)
-// "/api/students/payments/:id"
-router.delete("/payments/:id", async (req, res, next) => {
-  const { id } = req.params;
+// "/api/students/:id"
 
-  try {
-    await db(`DELETE FROM payments WHERE id=${id}`)
-    res.send({message: "Payment deleted"});
-  } catch (error) {
-    console.log(error)
-  }
-});
 
 // DELETE student (feature extension)
-// "/api/students/:id"
-router.delete("/:id", async (req, res, next) => {
-  const { id } = req.params;
-
-  try {
-    await db(`DELETE FROM students WHERE id=${id}`)
-    res.send({message: "Student deleted"});
-  } catch (error) {
-    console.log(error)
-  }
-})
-
-// GET all students with their payments 
-// "/api/students/payments"
 
 
 //PATCH student info (feature extension)
+
+// not sure if this is needed
+// GET all students with their payments 
+
+
 
 module.exports = router;

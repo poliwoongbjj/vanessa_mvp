@@ -27,10 +27,15 @@ To streamline payment management for my dad's guitar school, I developed Payment
 ![image of mysql tables](<public/MVP Payment Tracker Database Schema.png>)
 IMPORTANT: The foreign key for tables is student_id and the only column that accepts NULL values is payment_date.
 
+Below are the API Routes for the backend.
+
+- [API Routes](https://docs.google.com/document/d/1Mrwz6zbAXslzsoxJ3Xz6_aRhWLlU_PPRsS563qEdy7A/edit?usp=sharing)
+
 ## Development
 
 - Run `npm start` in project directory to start the Express server on port 4000
 - In another terminal, do `cd client` and run `npm run dev` to start the client in development mode with hot reloading in port 5173.
+
 
 ## Front-end components and App features
 
