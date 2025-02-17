@@ -70,7 +70,7 @@ export default function Student () {
           {student && (
             <div className="py-3 px-3 shadow">
               <div className="d-flex align-items-center justify-content-between">
-          <h2 className="mb-0">{`${student.first_name} ${student.last_name} Payment History`}</h2>
+          <h2 className="mb-0">{`${student.first_name} ${student.last_name}: Payment History`}</h2>
           <button className="btn btn-primary btn-sm ms-3 mb-1" onClick={()=> addPayment(student.id)}>Add Payment</button>
           </div>
           <div className="border-bottom mb-3"></div>
