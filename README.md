@@ -24,7 +24,8 @@ To streamline payment management for my dad's guitar school, I developed a full-
 
 - In your MySQL console, you can run `use tuition_tracker;` and then `describe students;` to see the structure of the students table. Same thing for the 'payments' table. This is a description of the tables:
 
-![image of mysql tables](<public/MVP Payment Tracker Database Schema.png>)
+![image of mysql tables](tuition_tracker_database_schema.png)
+
 IMPORTANT: The foreign key for tables is student_id and the only column that accepts NULL values is payment_date.
 
 Below are the API Routes for the backend.

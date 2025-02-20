@@ -10,13 +10,13 @@ To streamline payment management for my dad's guitar school, I developed a full-
 ## Database Prep
 
 - Access the MySQL interface in your terminal by running `mysql -u root -p`
-- Create a new database called mvp: `create database mvp`
+- Create a new database called tuition_tracker: `create database tuition_tracker`
 - Add a `.env` file to the project folder of this repository containing the MySQL authentication information for MySQL user. For example:
 
  ```
    DB_HOST=localhost
    DB_USER=root
-   DB_NAME=mvp
+   DB_NAME=tuition_tracker
    DB_PASS=YOURPASSWORD
 ```
 
