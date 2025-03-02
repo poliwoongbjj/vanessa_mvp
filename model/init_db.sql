@@ -1,5 +1,6 @@
-DROP TABLE IF EXISTS `payments`;
 DROP TABLE IF EXISTS `students`;
+DROP TABLE IF EXISTS `payments`;
+DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE students (
      id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -25,6 +26,17 @@ CREATE TABLE payments(
      FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
+CREATE TABLE users (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'student') NOT NULL DEFAULT 'student',
+    student_id INT UNSIGNED NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL
+);
+
+-- Add some sample data
 INSERT INTO students (first_name, last_name, email, phone, tuition, enrolled, instrument)
 VALUES
 ('John', 'Doe', 'johndoe@example.com', '123-456-7890', 200.00, TRUE, 'guitar'),
@@ -39,3 +51,6 @@ VALUES
 (3, NULL, '2025-02-15', FALSE),  
 (4, '2025-02-05', '2025-02-20', TRUE);
 
+INSERT INTO users (username, password, role, student_id) VALUES
+('admin', '$2b$10$5dwsS5snIRlKu8ka5r5UO.YzLzKfb3/zngZLb8fnJnpJ1Oe/1pfXi', 'admin', NULL), -- password: admin123
+('johnstudent', '$2b$10$0O9RxbsL1EL/pwZnTmgqAO9oJ/X0UVDUAaJgmLS6S6N9eCtIcbYvS', 'student', 1); -- password: student123
