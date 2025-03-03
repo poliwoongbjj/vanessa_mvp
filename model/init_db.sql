@@ -30,9 +30,8 @@ CREATE TABLE users (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'student') NOT NULL DEFAULT 'student',
+    isAdmin BOOLEAN NOT NULL DEFAULT FALSE,
     student_id INT UNSIGNED NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL
 );
 
@@ -51,6 +50,10 @@ VALUES
 (3, NULL, '2025-02-15', FALSE),  
 (4, '2025-02-05', '2025-02-20', TRUE);
 
-INSERT INTO users (username, password, role, student_id) VALUES
-('admin', '$2b$10$5dwsS5snIRlKu8ka5r5UO.YzLzKfb3/zngZLb8fnJnpJ1Oe/1pfXi', 'admin', NULL), -- password: admin123
-('johnstudent', '$2b$10$0O9RxbsL1EL/pwZnTmgqAO9oJ/X0UVDUAaJgmLS6S6N9eCtIcbYvS', 'student', 1); -- password: student123
+-- Sample user data (passwords would be hashed in production)
+INSERT INTO users (username, password, isAdmin, student_id)
+VALUES
+-- Password: admin123 (hashed in production)
+('admin', '$2b$10$5dwsS5snIRlKu8ka5r5UO.YzLzKfb3/zngZLb8fnJnpJ1Oe/1pfXi', TRUE, NULL),
+-- Password: student123 (hashed in production)
+('johndoe', '$2b$10$0O9RxbsL1EL/pwZnTmgqAO9oJ/X0UVDUAaJgmLS6S6N9eCtIcbYvS', FALSE, 1);
