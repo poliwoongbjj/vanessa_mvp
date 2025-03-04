@@ -1,20 +1,16 @@
 var express = require("express");
 var router = express.Router();
 const db = require("../model/helper");
+const {
+  userShouldBeLoggedIn,
+  userShouldBeAdmin,
+  userAccessOwnStudentData,
+} = require("../middlewares/userShouldBeLoggedIn");
 
-// all the routes start with /api/students because that is what is in the app.js
+// Apply authentication to all routes
+router.use(userShouldBeLoggedIn);
 
-// GET all students
-// "/api/students"
-router.get("/", async (req, res, next) => {
-  try {
-    const results = await db("SELECT * FROM students ORDER BY first_name;");
-    res.send(results.data);
-  } catch (error) {
-    console.log(error);
-  }
-});
-
+// Helper function to transform student data
 const treatStudentData = (data) => {
   const response = {
     id: data[0].id,
@@ -40,7 +36,18 @@ const treatStudentData = (data) => {
   return response;
 };
 
-// GET single student and include payment info
+// GET all students - Admin only
+// "/api/students"
+router.get("/", userShouldBeAdmin, async (req, res, next) => {
+  try {
+    const results = await db("SELECT * FROM students ORDER BY first_name;");
+    res.send(results.data);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// GET single student and payment info - Admin or own student only
 // "/api/students/:id"
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
@@ -56,6 +63,10 @@ router.get("/:id", async (req, res, next) => {
       WHERE students.id = ${id};`
     );
 
+    if (results.data.length === 0) {
+      return res.status(404).send({ message: "Student not found" });
+    }
+
     const student = treatStudentData(results.data);
     res.send(student);
   } catch (error) {
@@ -63,9 +74,9 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// GET unpaid students
+// GET unpaid students - Admin only
 // "/api/students/check/unpaid" -- NEW ROUTE
-router.get("/check/unpaid", async (req, res, next) => {
+router.get("/check/unpaid", userShouldBeAdmin, async (req, res, next) => {
   // console.log("*** Entering unpaid ***");
   try {
     const results = await db(
@@ -86,12 +97,13 @@ router.get("/check/unpaid", async (req, res, next) => {
   }
 });
 
-// POST new student
+// POST new student - Admin only
 // "/api/students"
-router.post("/", async (req, res, next) => {
+router.post("/", userShouldBeAdmin, async (req, res, next) => {
   const { first_name, last_name, email, phone, tuition, enrolled, instrument } =
     req.body;
   try {
+    // Insert new student
     await db(
       `INSERT INTO students (first_name, last_name, email, phone, tuition, enrolled, instrument) VALUES ("${first_name}", "${last_name}", "${email}", "${phone}", ${tuition}, ${enrolled}, "${instrument}");`
     );
@@ -101,7 +113,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// POST payment
+// POST payment - Admin only
 // "/api/students/:id"
 // Because this is for one student, you need to use the treatStudentData function
 router.post("/:id", async (req, res, next) => {
@@ -121,6 +133,7 @@ router.post("/:id", async (req, res, next) => {
       FROM students 
       LEFT JOIN payments ON students.id = payments.student_id 
       WHERE students.id = ${id};`);
+
     const student = treatStudentData(results.data);
     res.send(student);
   } catch (error) {
@@ -130,6 +143,7 @@ router.post("/:id", async (req, res, next) => {
 
 // PATCH unpaid payment for specific student using payment id (payment_date and is_paid)
 // UPDATE payments SET payment_date = "2025-02-06", is_paid=NOT is_paid WHERE id=4;
+// mark payment as paid - Both admin and student (own payment only)
 router.put("/check/unpaid/:id", async (req, res, next) => {
   const { id } = req.params;
   const { payment_date } = req.body;
@@ -140,24 +154,61 @@ router.put("/check/unpaid/:id", async (req, res, next) => {
   }
 
   try {
+    // Get the payment and check if it exists
+    const paymentResult = await db(`SELECT * FROM payments WHERE id = ${id}`);
+
+    if (paymentResult.data.length === 0) {
+      return res.status(404).send({ message: "Payment not found" });
+    }
+
+    const payment = paymentResult.data[0];
+
+    // If user is a student, check if payment belongs to them
+    if (!req.isAdmin) {
+      if (payment.student_id !== req.student_id) {
+        return res
+          .status(403)
+          .send({ message: "You can only mark your own payments as paid" });
+      }
+    }
+
     await db(
       `UPDATE payments SET payment_date = "${payment_date}", is_paid=1 WHERE id=${id};`
     );
 
-    //GET THE DATA
-    const results =
-      await db(`SELECT students.id, students.first_name, students.last_name, payments.id AS payment_id, payments.due_date, payments.payment_date
-    FROM students
-    JOIN payments ON students.id = payments.student_id
-     WHERE payments.is_paid = 0
-     ORDER BY students.first_name ASC;`);
-    res.send(results.data);
+    // Response depends on user role
+    if (req.isAdmin) {
+      // Get all unpaid payments for admin
+      const results = await db(
+        `SELECT students.id, students.first_name, students.last_name, 
+        payments.id AS payment_id, payments.due_date, payments.payment_date
+        FROM students
+        JOIN payments ON students.id = payments.student_id
+        WHERE payments.is_paid = 0
+        ORDER BY students.first_name ASC;`
+      );
+      res.send(results.data);
+    } else {
+      // Get student's data for student user
+      const results = await db(
+        `SELECT students.*, 
+        DATE_FORMAT(payments.due_date, '%M %d %Y') AS due_date,
+        DATE_FORMAT(payments.payment_date,'%M %d %Y') AS payment_date,
+        payments.is_paid, 
+        payments.id AS payment_id 
+        FROM students 
+        LEFT JOIN payments ON students.id = payments.student_id 
+        WHERE students.id = ${req.student_id};`
+      );
+      const student = treatStudentData(results.data);
+      res.send(student);
+    }
   } catch (error) {
     console.log(error);
   }
 });
 
-// PATCH student info
+// PATCH student info - Admin only
 // "/api/students/:id"
 router.patch("/:id", async (req, res, next) => {
   const { id } = req.params;
@@ -212,30 +263,33 @@ router.patch("/:id", async (req, res, next) => {
   }
 });
 
-// DELETE payment
+// DELETE payment - Admin only
 // "/api/students/payments/:paymentId"
-router.delete("/payments/:paymentId", async (req, res, next) => {
-  const { paymentId } = req.params;
+router.delete(
+  "/payments/:paymentId",
+  userShouldBeAdmin,
+  async (req, res, next) => {
+    const { paymentId } = req.params;
 
-  try {
-    // First check if payment exists
-    const checkPayment = await db(
-      `SELECT * FROM payments WHERE id = ${paymentId};`
-    );
+    try {
+      // First check if payment exists
+      const checkPayment = await db(
+        `SELECT * FROM payments WHERE id = ${paymentId};`
+      );
 
-    if (checkPayment.data.length === 0) {
-      return res.status(404).send({ message: "Payment not found" });
-    }
+      if (checkPayment.data.length === 0) {
+        return res.status(404).send({ message: "Payment not found" });
+      }
 
-    // Get student ID before deleting payment (for returning updated student data)
-    const studentId = checkPayment.data[0].student_id;
+      // Get student ID before deleting payment (for returning updated student data)
+      const studentId = checkPayment.data[0].student_id;
 
-    // Delete the payment
-    await db(`DELETE FROM payments WHERE id = ${paymentId};`);
+      // Delete the payment
+      await db(`DELETE FROM payments WHERE id = ${paymentId};`);
 
-    // Get updated student data
-    const results = await db(
-      `SELECT students.*, 
+      // Get updated student data
+      const results = await db(
+        `SELECT students.*, 
       DATE_FORMAT(payments.due_date, '%M %d %Y') AS due_date,
       DATE_FORMAT(payments.payment_date,'%M %d %Y') AS payment_date,
       payments.is_paid, 
@@ -243,16 +297,17 @@ router.delete("/payments/:paymentId", async (req, res, next) => {
       FROM students 
       LEFT JOIN payments ON students.id = payments.student_id 
       WHERE students.id = ${studentId};`
-    );
+      );
 
-    const student = treatStudentData(results.data);
-    res.send(student);
-  } catch (error) {
-    console.error("Error deleting payment:", error);
-    res.status(500).send({ message: "Error deleting payment" });
+      const student = treatStudentData(results.data);
+      res.send(student);
+    } catch (error) {
+      console.error("Error deleting payment:", error);
+      res.status(500).send({ message: "Error deleting payment" });
+    }
   }
-});
-// DELETE student
+);
+// DELETE student - Admin only
 // "/api/students/:id"
 router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
