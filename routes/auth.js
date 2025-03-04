@@ -104,7 +104,6 @@ router.post("/login", async (req, res) => {
 
     // Check if password is correct
     const correctPassword = await bcrypt.compare(password, user.password);
-    console.log(password, user.password, correctPassword);
     if (!correctPassword) {
       return res.status(401).send({ message: "Incorrect password" });
     }
@@ -124,14 +123,12 @@ router.post("/login", async (req, res) => {
     // Create token
     const token = jwt.sign(payload, supersecret);
 
-    res.status(200).send({ token });
-
-    // Set token as HTTP-only cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 8 * 60 * 60 * 1000, // 8 hours
-      sameSite: "strict",
-    });
+    // // Set token as HTTP-only cookie
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   maxAge: 8 * 60 * 60 * 1000, // 8 hours
+    //   sameSite: "strict",
+    // });
 
     // Return token and user info (excluding password)
     const { password: _, ...userWithoutPassword } = user;
@@ -147,11 +144,11 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Logout
-router.post("/logout", (req, res) => {
-  res.clearCookie("token");
-  res.send({ message: "Logout successful" });
-});
+// // Logout
+// router.post("/logout", (req, res) => {
+//   res.clearCookie("token");
+//   res.send({ message: "Logout successful" });
+// });
 
 // Get current user info
 router.get("/profile", userShouldBeLoggedIn, async (req, res) => {
@@ -159,7 +156,7 @@ router.get("/profile", userShouldBeLoggedIn, async (req, res) => {
     const result = await db(
       `SELECT id, username, student_id FROM users WHERE id = ${req.user_id}`
     );
-
+    console.log(result, result);
     if (result.data.length === 0) {
       return res.status(404).send({ message: "User not found" });
     }
