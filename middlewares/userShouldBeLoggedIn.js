@@ -42,7 +42,7 @@ const userShouldBeAdmin = (req, res, next) => {
 };
 
 // Middleware to check if user is accessing their own student data
-const userShouldOwnStudent = (req, res, next) => {
+const userAccessOwnStudentData = (req, res, next) => {
   // Admin can access any student data
   if (req.isAdmin) {
     return next();
@@ -63,5 +63,5 @@ const userShouldOwnStudent = (req, res, next) => {
 module.exports = {
   userShouldBeLoggedIn,
   userShouldBeAdmin,
-  userShouldOwnStudent,
+  userAccessOwnStudentData,
 };
