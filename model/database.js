@@ -12,17 +12,19 @@ const con = mysql.createConnection({
   user: DB_USER || "root",
   password: DB_PASS,
   database: DB_NAME || "todos",
-  multipleStatements: true
+  multipleStatements: true,
 });
 
-con.connect(function(err) {
+con.connect(function (err) {
   if (err) throw err;
   console.log("Connected!");
 
   let sql = fs.readFileSync(__dirname + "/init_db.sql").toString();
-  con.query(sql, function(err, result) {
+  con.query(sql, function (err, result) {
     if (err) throw err;
-    console.log("Table creation `students` and `payements` was successful!");
+    console.log(
+      "Table creation `students`, `payments`, and `users` were successful!"
+    );
 
     console.log("Closing...");
   });

@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS `students`;
 DROP TABLE IF EXISTS `payments`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `students`;
 
 CREATE TABLE students (
      id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -49,11 +49,3 @@ VALUES
 (2, '2025-02-03', '2025-02-12', TRUE),
 (3, NULL, '2025-02-15', FALSE),  
 (4, '2025-02-05', '2025-02-20', TRUE);
-
--- Sample user data (passwords would be hashed in production)
-INSERT INTO users (username, password, isAdmin, student_id)
-VALUES
--- Password: admin123 (hashed in production)
-('admin', '$2b$10$5dwsS5snIRlKu8ka5r5UO.YzLzKfb3/zngZLb8fnJnpJ1Oe/1pfXi', TRUE, NULL),
--- Password: student123 (hashed in production)
-('johndoe', '$2b$10$0O9RxbsL1EL/pwZnTmgqAO9oJ/X0UVDUAaJgmLS6S6N9eCtIcbYvS', FALSE, 1);
