@@ -1,18 +1,53 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-export default function EditStudent({ student, setStudent, setIsEditing }) {
+export default function EditStudent() {
   const [formData, setFormData] = useState({
-    first_name: student.first_name,
-    last_name: student.last_name,
-    email: student.email,
-    phone: student.phone,
-    tuition: student.tuition,
-    enrolled: student.enrolled,
-    instrument: student.instrument,
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    tuition: "",
+    enrolled: false,
+    instrument: "",
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  // const navigate = useNavigate();
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  // Fetch student data
+  useEffect(() => {
+    const fetchStudent = async () => {
+      try {
+        const { data } = await axios(`/api/students/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        setFormData({
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          phone: data.phone,
+          tuition: data.tuition,
+          enrolled: data.enrolled,
+          instrument: data.instrument,
+        });
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load student data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudent();
+  }, [id]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -29,25 +64,39 @@ export default function EditStudent({ student, setStudent, setIsEditing }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    setError("");
+    setSuccess(false);
+
     try {
-      const response = await fetch(`/api/students/${student.id}`, {
+      await axios(`/api/students/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(formData),
+        data: formData,
       });
 
-      if (response.ok) {
-        const updatedStudent = await response.json();
-        setStudent(updatedStudent);
-        setIsEditing(false);
-      } else {
-        alert("Error updating student.");
-      }
-    } catch (error) {
-      console.error("Error updating student:", error);
+      setSuccess(true);
+
+      // Redirect back to student profile after short delay
+      setTimeout(() => {
+        navigate(`/students/${id}`);
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Error updating student.");
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="container mt-5 text-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -56,6 +105,18 @@ export default function EditStudent({ student, setStudent, setIsEditing }) {
         <div className="col-lg-8 col-md-10 col-sm-12 shadow">
           <h2 className="mt-2">Edit Student</h2>
           <div className="border-bottom mb-3"></div>
+
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="alert alert-success" role="alert">
+              Student updated successfully! Redirecting...
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="row g-3">
@@ -172,13 +233,18 @@ export default function EditStudent({ student, setStudent, setIsEditing }) {
               </div>
 
               <div className="col-12 mb-3">
-                <button type="submit" className="btn btn-primary me-2">
+                <button
+                  type="submit"
+                  className="btn btn-primary me-2"
+                  disabled={success}
+                >
                   Save Changes
                 </button>
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => navigate(`/students/${id}`)}
+                  disabled={success}
                 >
                   Cancel
                 </button>
