@@ -34,6 +34,12 @@ const userShouldBeLoggedIn = (req, res, next) => {
 
 // Middleware to check if user is an admin
 const userShouldBeAdmin = (req, res, next) => {
+  console.log("Admin check:", {
+    isAdmin: req.isAdmin,
+    type: typeof req.isAdmin,
+    userId: req.user_id,
+  });
+
   if (!req.isAdmin) {
     return res.status(403).send({ message: "Admin access required" });
   }

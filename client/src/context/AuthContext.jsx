@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
+      console.log("Fetched user data:", data);
 
       if (response.ok) {
         setCurrentUser(data);
@@ -52,6 +53,13 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!currentUser,
     fetchUserData,
   };
+
+  console.log("Auth Context Values:", {
+    currentUser,
+    isAdminCheck: currentUser?.isAdmin,
+    isAdminType: typeof currentUser?.isAdmin,
+    isAdminResult: currentUser?.isAdmin === 1 || currentUser?.isAdmin === true,
+  });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
