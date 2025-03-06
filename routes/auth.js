@@ -154,7 +154,7 @@ router.post("/login", async (req, res) => {
 router.get("/profile", userShouldBeLoggedIn, async (req, res) => {
   try {
     const result = await db(
-      `SELECT id, username, student_id FROM users WHERE id = ${req.user_id}`
+      `SELECT id, username, isAdmin, student_id FROM users WHERE id = ${req.user_id}`
     );
     console.log(result, result);
     if (result.data.length === 0) {
